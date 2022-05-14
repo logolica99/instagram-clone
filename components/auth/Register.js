@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { View, Button, TextInput } from "react-native";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, collection, setDoc ,doc } from "firebase/firestore";
+import { app } from "../../App";
 
 export class Register extends Component {
   constructor(props) {
@@ -11,21 +13,28 @@ export class Register extends Component {
       name: "",
     };
     this.onSignUp = this.onSignUp.bind(this);
+  
   }
   onSignUp() {
     const { email, name, password } = this.state;
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        const db = getFirestore(app);
         // Signed in
         const user = userCredential.user;
-        console.log(user);
+
+       setDoc(doc(db,`users/${user.uid}`),{
+         name,
+         email
+       })
+
         // ...
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(error);
+        console.log(errorMessage);
       });
   }
 
@@ -46,6 +55,7 @@ export class Register extends Component {
           onChangeText={(password) => this.setState({ password })}
         />
         <Button title="Sign Up" onPress={() => this.onSignUp()} />
+    
       </View>
     );
   }

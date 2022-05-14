@@ -1,23 +1,27 @@
 import { StatusBar } from "expo-status-bar";
 
-import { View, Text } from "react-native";
+import { View, Text, Button } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import LandingScreen from "./components/auth/Landing";
 import RegisterScreen from "./components/auth/Register";
 import LoginScreen from "./components/auth/Login";
+import MainScreen from "./components/Main";
 
 //firebase Config
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { Component } from "react";
+import { getFirestore, collection, getDoc, doc } from "firebase/firestore";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import { applyMiddleware } from "@reduxjs/toolkit";
+import rootReducer from "./redux/reducers";
+import thunk from "redux-thunk";
+const store = configureStore({ reducer: rootReducer }, applyMiddleware(thunk));
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDXsHmk43fQuEHn2ybGn3X41PwdBYOr7es",
   authDomain: "instagram-clone-90161.firebaseapp.com",
@@ -29,7 +33,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 const Stack = createStackNavigator();
 
@@ -84,9 +88,9 @@ export class App extends Component {
     }
     if (loggedIn) {
       return (
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text>User is Logged in </Text>
-        </View>
+        <Provider store={store}>
+          <MainScreen />
+        </Provider>
       );
     }
   }
